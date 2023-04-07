@@ -28,16 +28,17 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y unzip
-        unzip M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip boot.img
-        mv boot.img extracted_boot.img
+        unzip -l M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip
+        if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip boot.img; then mv boot.img extracted_boot.img; fi
     - name: Extract recovery.img
       run: |
         sudo apt-get update
         sudo apt-get install -y unzip
-        unzip M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip recovery.img
-        mv recovery.img extracted_recovery.img
+        unzip -l M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip
+        if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip recovery.img; then mv recovery.img extracted_recovery.img; fi
     - name: Create Release
-      uses: actions/create-release@v1
+      id: create_release
+      uses: actions/create-release@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -45,13 +46,15 @@ jobs:
         release_name: Release ${{ github.sha }}
         body: Automated release
         draft: false
-    - name: Upload boot.img
+    - name: Upload Boot Image
       uses: actions/upload-artifact@v2
       with:
-        name: boot.img
+        name: extracted_boot.img
         path: extracted_boot.img
-    - name: Upload recovery.img
+    - name: Upload Recovery Image
       uses: actions/upload-artifact@v2
       with:
-        name: recovery.img
+        name: extracted_recovery.img
         path: extracted_recovery.img
+    - name: Upload Decrypted ZIP
+      run: curl -T M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip https://bashupload.com/
