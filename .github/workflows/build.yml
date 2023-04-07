@@ -38,5 +38,5 @@ jobs:
         if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip recovery.img; then mv recovery.img extracted_recovery.img; fi
     - name: Upload Extracted Files
       run: |
-        curl -s -F "file=@extracted_boot.img" https://file.io/?expires=1d
-        curl -s -F "file=@extracted_recovery.img" https://file.io/?expires=1d
+        curl -s -F "file=@extracted_boot.img" https://filesend.jp/upload.cgi?lang=en
+        curl -s -F "file=@extracted_recovery.img" https://filesend.jp/upload.cgi?lang=en
