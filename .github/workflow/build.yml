@@ -1,0 +1,63 @@
+name: OZIP Decrypter
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  extract_files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download OZIP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y aria2
+          aria2c https://assorted.downloads.oppo.com/firmware/CPH1723/M6763A_11_OTA_0450_all_T6tah4NhiqWo.ozip
+      - name: Decrypt OZIP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip zip
+          sudo pip3 install setuptools wheel docopt pycryptodome
+          wget https://raw.githubusercontent.com/techyminati/oppo_ozip_decrypt/master/ozipdecrypt.py
+          python3 ozipdecrypt.py M6763A_11_OTA_0450_all_T6tah4NhiqWo.ozip
+      - name: Extract boot.img
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip
+          unzip M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip boot.img
+          mv boot.img extracted_boot.img
+      - name: Extract recovery.img
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip
+          unzip M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip recovery.img
+          mv recovery.img extracted_recovery.img
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.sha }}
+          release_name: Release ${{ github.sha }}
+          body: Automated release
+          draft: false
+          prerelease: false
+      - name: Upload boot.img
+        uses: actions/upload-artifact@v2
+        with:
+          name: extracted_boot.img
+          path: ./extracted_boot.img
+      - name: Upload recovery.img
+        uses: actions/upload-artifact@v2
+        with:
+          name: extracted_recovery.img
+          path: ./extracted_recovery.img
+      - name: Upload Decrypted ZIP
+        run: curl -T extracted_boot.img https://bashupload.com/${{ env.RELEASE_FILE }}
+        env:
+          RELEASE_FILE: extracted_boot.img
