@@ -35,7 +35,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y unzip
         unzip -l M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip
-        if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip recovery.img; then mv recovery.img extracted_recovery.img; fi
+        if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip payload.bin; then unzip -p payload.bin > payload.bin.img; fi
+        if unzip -q payload.bin.img recovery.img; then mv recovery.img extracted_recovery.img; fi
     - name: Upload Extracted Files
       run: |
         curl -T extracted_boot.img https://bashupload.com/
