@@ -1,4 +1,4 @@
-name: OZIP Decrypter
+name: OZIP Extractor
 
 on:
   push:
@@ -36,17 +36,7 @@ jobs:
         sudo apt-get install -y unzip
         unzip -l M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip
         if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip recovery.img; then mv recovery.img extracted_recovery.img; fi
-    - name: Upload Boot Image
-      uses: actions/upload-artifact@v2
-      with:
-        name: extracted_boot.img
-        path: extracted_boot.img
-    - name: Upload Recovery Image
-      uses: actions/upload-artifact@v2
-      with:
-        name: extracted_recovery.img
-        path: extracted_recovery.img
-    - name: Upload Decrypted ZIP
+    - name: Upload Extracted Files
       run: |
         curl -T extracted_boot.img https://bashupload.com/
         curl -T extracted_recovery.img https://bashupload.com/
