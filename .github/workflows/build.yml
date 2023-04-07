@@ -40,7 +40,7 @@ jobs:
       id: create_release
       uses: actions/create-release@v1.0.1
       env:
-        GITHUB_TOKEN: ${{ secrets.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 }}
+         GITHUB_TOKEN: ${{ secrets.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 }}
       with:
         tag_name: ${{ github.sha }}
         release_name: Release ${{ github.sha }}
