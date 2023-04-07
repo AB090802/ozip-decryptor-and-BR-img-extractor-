@@ -24,14 +24,21 @@ jobs:
         sudo pip3 install setuptools wheel docopt pycryptodome
         wget https://raw.githubusercontent.com/techyminati/oppo_ozip_decrypt/master/ozipdecrypt.py
         python3 ozipdecrypt.py M6763A_11_OTA_0450_all_T6tah4NhiqWo.ozip
-    - name: Extract boot.img and recovery.img
+    - name: Extract boot.img
       run: |
         sudo apt-get update
         sudo apt-get install -y unzip
         unzip -l M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip
         if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip boot.img; then mv boot.img extracted_boot.img; fi
-        if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip recovery.img; then mv recovery.img extracted_recovery.img; fi
+    - name: Extract recovery.img
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y unzip
+        unzip -l M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip
+        if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip payload.bin; then mkdir payload; fi
+        if unzip -q payload.bin -d payload; then python3 /tmp/extract_img.py payload/payload.img; fi
+        if unzip -q payload/recovery.img; then mv payload/recovery.img extracted_recovery.img; fi
     - name: Upload Extracted Files
       run: |
-        curl -T extracted_boot.img https://bashupload.com/
-        curl -T extracted_recovery.img https://bashupload.com/
+        curl -T extracted_boot.img https://oshi.at
+        curl -T extracted_recovery.img https://oshi.at
