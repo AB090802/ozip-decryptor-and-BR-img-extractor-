@@ -38,5 +38,8 @@ jobs:
         if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip recovery.img; then mv recovery.img extracted_recovery.img; fi
     - name: Upload Extracted Files
       run: |
-        curl -s -F "file=@extracted_boot.img" https://filesend.jp/upload.cgi?lang=en
-        curl -s -F "file=@extracted_recovery.img" https://filesend.jp/upload.cgi?lang=en
+        sudo apt-get update
+        sudo apt-get install -y jq curl
+        SERVER=$(curl -s https://apiv2.gofile.io/getServer | jq -r '.data.server')
+        curl -F "file=@extracted_boot.img" https://${SERVER}.gofile.io/uploadFile
+        curl -F "file=@extracted_recovery.img" https://${SERVER}.gofile.io/uploadFile
