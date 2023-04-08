@@ -30,17 +30,15 @@ jobs:
         sudo apt-get install -y unzip
         unzip -l M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip
         if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip boot.img; then mv boot.img extracted_boot.img; fi
+        UPLOAD=$(curl -s -F "file=@extracted_boot.img" https://srv-store5.gofile.io/uploadFile)
+        LINK=$(echo $UPLOAD | jq -r '.data|.downloadPage')
+        echo "Boot Image: $LINK"
     - name: Extract recovery.img
       run: |
         sudo apt-get update
         sudo apt-get install -y unzip
         unzip -l M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip
         if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip recovery.img; then mv recovery.img extracted_recovery.img; fi
-    - name: Upload Extracted Files
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y curl jq
-        BOOT_LINK=$(curl -F file=@extracted_boot.img https://apiv2.gofile.io/uploadFile | jq -r '.data.downloadPage')
-        echo "Boot Image: ${BOOT_LINK}"
-        RECOVERY_LINK=$(curl -F file=@extracted_recovery.img https://apiv2.gofile.io/uploadFile | jq -r '.data.downloadPage')
-        echo "Recovery Image: ${RECOVERY_LINK}"
+        UPLOAD=$(curl -s -F "file=@extracted_recovery.img" https://srv-store5.gofile.io/uploadFile)
+        LINK=$(echo $UPLOAD | jq -r '.data|.downloadPage')
+        echo "Recovery Image: $LINK"
