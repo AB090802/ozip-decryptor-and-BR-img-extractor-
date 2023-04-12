@@ -1,44 +1,39 @@
-name: OZIP Extractor
-
+name: Extract Boot Image Files
 on:
   push:
     branches: [ main ]
-  schedule:
-    - cron: '0 0 * * *'
 
 jobs:
-  build:
+  extract_boot_files:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Download OZIP
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y aria2
-        aria2c https://assorted.downloads.oppo.com/firmware/CPH1723/M6763A_11_OTA_0450_all_T6tah4NhiqWo.ozip
-    - name: Decrypt OZIP
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y python3-pip zip
-        sudo pip3 install setuptools wheel docopt pycryptodome
-        wget https://raw.githubusercontent.com/techyminati/oppo_ozip_decrypt/master/ozipdecrypt.py
-        python3 ozipdecrypt.py M6763A_11_OTA_0450_all_T6tah4NhiqWo.ozip
-    - name: Extract boot.img
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y unzip
-        unzip -l M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip
-        if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip boot.img; then mv boot.img extracted_boot.img; fi
-        UPLOAD=$(curl -s -F "file=@extracted_boot.img" https://srv-store5.gofile.io/uploadFile)
-        LINK=$(echo $UPLOAD | jq -r '.data|.downloadPage')
-        echo "Boot Image: $LINK"
-    - name: Extract recovery.img
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y unzip
-        unzip -l M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip
-        if unzip -q M6763A_11_OTA_0450_all_T6tah4NhiqWo.zip recovery.img; then mv recovery.img extracted_recovery.img; fi
-        UPLOAD=$(curl -s -F "file=@extracted_recovery.img" https://srv-store5.gofile.io/uploadFile)
-        LINK=$(echo $UPLOAD | jq -r '.data|.downloadPage')
-        echo "Recovery Image: $LINK"
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Install JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y git unzip wget
+      - name: Clone mktool repository
+        run: |
+          git clone https://github.com/GameTheory-/mktool.git
+      - name: Make mktool executable
+        run: |
+          cd mktool
+          chmod +x run.sh
+      - name: Extract Boot Image
+        run: |
+          cd mktool
+          wget https://s3.ap-south-1.amazonaws.com/blob-ap-south-1-ukyez4/sara/87/8729/872917a6-7067-4833-bee9-f1fb11808720.bin?response-content-disposition=attachment%3B%20filename%3D%22boot.img%22&response-content-type=&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA4DM2EY46SOWUMUP4%2F20230412%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20230412T174401Z&X-Amz-SignedHeaders=host&X-Amz-Expires=1800&X-Amz-Signature=f67784c6aec201742eb424f33a67f4b8c00bb86818acc85e259d55680a5eca08 -O boot.img
+          ./run.sh unpackbootimg boot.img
+      - name: Extract Ramdisk Files
+        run: |
+          # Extract the contents of the RAM disk image
+          cd mktool
+          gunzip initramfs.cpio.gz
+          mkdir initramfs
+          cd initramfs
+          cpio -i < ../initramfs.cpio
+          # The extracted files will be in the initramfs directory
