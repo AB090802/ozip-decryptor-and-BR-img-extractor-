@@ -13,6 +13,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
+          distribution: 'adopt'
       - name: Install Dependencies
         run: |
           sudo apt-get update && sudo apt-get install -y git unzip wget
@@ -26,7 +27,7 @@ jobs:
       - name: Extract Boot Image
         run: |
           cd mktool
-          wget https://s3.ap-south-1.amazonaws.com/blob-ap-south-1-ukyez4/sara/87/8729/872917a6-7067-4833-bee9-f1fb11808720.bin?response-content-disposition=attachment%3B%20filename%3D%22boot.img%22&response-content-type=&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA4DM2EY46SOWUMUP4%2F20230412%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20230412T174401Z&X-Amz-SignedHeaders=host&X-Amz-Expires=1800&X-Amz-Signature=f67784c6aec201742eb424f33a67f4b8c00bb86818acc85e259d55680a5eca08 -O boot.img
+          wget https://s3.ap-south-1.amazonaws.com/blob-ap-south-1-ukyez4/sara/be/bea5/bea54e18-cc6f-4049-9cc9-2455af366f1d.bin?response-content-disposition=attachment%3B%20filename%3D%22boot.img%22&response-content-type=&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA4DM2EY46SOWUMUP4%2F20230412%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20230412T174828Z&X-Amz-SignedHeaders=host&X-Amz-Expires=1800&X-Amz-Signature=6c115d90951ebf1a47c41c8a6c5b2ee33a59f37105d637016d48c6d8fede132d -O boot.img
           ./run.sh unpackbootimg boot.img
       - name: Extract Ramdisk Files
         run: |
